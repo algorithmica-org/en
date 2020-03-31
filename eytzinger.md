@@ -1,6 +1,6 @@
 # Eytzinger Binary Search
 
-This tutorial is loosely based on a [46-page paper](https://arxiv.org/pdf/1509.05053.pdf](https://arxiv.org/pdf/1509.05053.pdf) by Paul-Virak Khuong and Pat Morin "Array layouts for comparison-based searching" and describes one particular way of performing efficient binary search by rearranging elements of a sorted array in a cache-friendly way.
+This tutorial is loosely based on a [46-page paper](https://arxiv.org/pdf/1509.05053.pdf) by Paul-Virak Khuong and Pat Morin "Array layouts for comparison-based searching" and describes one particular way of performing efficient binary search by rearranging elements of a sorted array in a cache-friendly way.
 
 We briefly review relevant concepts in processor architecture; if you want to get deeper, we recommend reading the original 2015 paper, as well as these articles:
 
@@ -147,7 +147,7 @@ We can now descend this array using only indices: we just start with $k=1$ and e
 
 The only problem arises when we need to restore the index of the resulting element, as $k$ may end up not pointing to a leaf node. Here is an example of how that can happen:
 
-```
+```python
     array:  1 2 3 4 5 6 7 8
 eytzinger:  4 2 5 1 6 3 7 8
 1st range:  ---------------  k := 1
@@ -228,7 +228,7 @@ We just need to ask memory manager to allocate our array on the beginning of a c
 alignas(64) int b[n+1];
 ```
 
-This is it. Now our algorithm is constantly prefetching 4 layers / cache lines ahead of time, which is covered by the bandwith of our RAM. This way the effective latency is reduced by a factor of 4. We are basically trading off bandwidth for latency.
+This is it. Now our algorithm is constantly prefetching 4 layers / cache lines ahead of time, which is covered by the bandwith of our RAM. This way the effective latency is reduced by a factor of 4, and we're basically trading off bandwidth for latency.
 
 ### Complete implementation
 
