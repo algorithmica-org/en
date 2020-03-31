@@ -69,7 +69,7 @@ The reality is much more complicated, e. g. main memory has pagination and HDD i
 
 * **Cache line** is the unit of data transfer between CPU and main memory. The cache line of your PC is most likely 64 bytes, meaning that the main memory is divided into blocks of 64 bytes, and whenever you request a byte, you are also fetching its cache line neighbours regardless whether your want it or not. *Fetching a cache line is like grabbing a 6-pack.*
 
-* **Eviction policy** is the method for deciding which data to retain in the cache. In CPUs, it is controlled by hardware, not software. For simplicity, programmer can assume that **least recently used (LRU)** policy is used, which just evicts the item that hasn't been used for the longest amount of time. *This is like prefering beer with later expiration dates.*
+* **Eviction policy** is the method for deciding which data to retain in the cache. In CPUs, it is controlled by hardware, not software. For simplicity, programmer can assume that **least recently used (LRU)** policy is used, which just evicts the item that hasn't been used for the longest amount of time. *This is like preferring beer with later expiration dates.*
 
 * **Bandwidth** is the rate at which data can be read or stored. For the purpose of designing algorithms, a more important characteristic is the **bandwidth-latency product** which basically tells how many cache lines you can request while waiting for the first one without queueing up. It is around 5 or more on most systems. *This is like having friends whom you can send for beers asynchronously.*
 
@@ -77,9 +77,9 @@ The reality is much more complicated, e. g. main memory has pagination and HDD i
 
 * **Spacial locality** is an access pattern where if a memory location is requested, it is likely that a nearby memory locations will be requested again in the near future. *This is like storing the kinds of beer that you like on the same shelf.*
 
-The main problem with binary search over a sorted array is that its memory accesses pattern is neither temporaly nor spacially local. For example, element $\lfloor \frac n 2 \rfloor$ is accessed very often (each search) and element $\lfloor \frac n 2 \rfloor + 1$ is not, while they are probably occupying the same cache line.
+The main problem with binary search over a sorted array is that its memory accesses pattern is neither temporary nor spacially local. For example, element $\lfloor \frac n 2 \rfloor$ is accessed very often (each search) and element $\lfloor \frac n 2 \rfloor + 1$ is not, while they are probably occupying the same cache line.
 
-We can overcome this by enumerating and permuting array elements in a more cache-friendly way, and chances are you already know this numeration.
+We can overcome this by enumerating and permuting array elements in a more cache-friendly way. The numeration we will use is actually half a millenium old, and chances are you already know it.
 
 ## The Eytzinger layout
 
@@ -156,13 +156,13 @@ eytzinger:  4 2 5 1 6 3 7 8
 4th range:        -          k := 2*k + 1  (=11)
 ```
 
-Here we query array of $[1, …, 8]$ for the lower bound of $x=4$. We compare it againts $4$, $2$ and $5$, and go left-right-right and end up with $k = 11$, which isn't even a valid array index.
+Here we query array of $[1, …, 8]$ for the lower bound of $x=4$. We compare it against $4$, $2$ and $5$, and go left-right-right and end up with $k = 11$, which isn't even a valid array index.
 
 Note that, unless the answer is the last element of the array, we compare $x$ against it at some point, and after we learn that it is not less than $x$, we start comparing $x$ against elements to the left, and all these comparisons will evaluate true (i. e. leading to the right). Hence, the solution to restoring the resulting element is to cancel some number of right turns.
 
 This can be done in an elegant way by observing that the right turns are recorded in the binary notation of $k$ as 1-bits, and so we just need to find the number of trailing ones in the binary notation and right-shift $k$ by exactly that amount.
 
-To do this we can invert the number (`~x`) and call "find first set" instruction available on most systems. In GCC, the correspolding builtin is `__builtin_ffs`.
+To do this we can invert the number (`~x`) and call "find first set" instruction available on most systems. In GCC, the corresponding builtin is `__builtin_ffs`.
 
 ```cpp
 int search(int x) 
@@ -178,7 +178,7 @@ int search(int x)
 }
 ```
 
-Note that $k$ will be zero if binary search returned no result (i. e. all elements are less than $x$ and all turns were right-turns that got cancelled). In that case, you can put a special flag in the first element of `b`.
+Note that $k$ will be zero if binary search returned no result (i. e. all elements are less than $x$ and all turns were right-turns that got canceled). In that case, you can put a special flag in the first element of `b`.
 
 This is already 2-3 times faster than `std::lower_bound`, but we are not going to stop there and apply a series of small incremental improvements.
 
@@ -220,7 +220,7 @@ The whole point of doing this is that there is a good chance that we will prefet
 
 Note that for each layer in the tree, except for the first 4 and possibly the last one, the number of nodes in that layer is divisible by 16, the block size. This means that the fraction of covered nodes on *each* iteration depends only on the position of the first offset of the array in respect to its cache line. But what is more important is that it can be made that all of $k$'s grand-grandchildren are covered by the same cache line.
 
-The way to achieve this is to place the first element of the array to the 1st position (0-indexed) of a cache line, or placing the array itself on the beginning of a cache line, since its first (i. e. `b[0]`) element is blank by design. This way the next $1 + 2 + 4 + 8 = 15$ elements of first 4 layers will occupy the rest of the cache line, and the rest of the array is alligned in nice 16-element blocks of nodes who share a grandpa.
+The way to achieve this is to place the first element of the array to the 1st position (0-indexed) of a cache line, or placing the array itself on the beginning of a cache line, since its first (i. e. `b[0]`) element is blank by design. This way the next $1 + 2 + 4 + 8 = 15$ elements of first 4 layers will occupy the rest of the cache line, and the rest of the array is alligned in nice 16-element blocks of nodes that share a grandpa.
 
 We just need to ask memory manager to allocate our array on the beginning of a cache line (by default it allocates your arrays wherever it wants), and that's it. To do this, we can use `alignas` specifier:
 
@@ -228,7 +228,7 @@ We just need to ask memory manager to allocate our array on the beginning of a c
 alignas(64) int b[n+1];
 ```
 
-This is it. Now our algorithm is constantly prefetching 4 layers / cache lines ahead of time, which is covered by the bandwith of our RAM. This way the effective latency is reduced by a factor of 4, and we're basically trading off bandwidth for latency.
+This is it. Now our algorithm is constantly prefetching 4 layers / cache lines ahead of time, which is covered by the bandwidth of our RAM. This way the effective latency is reduced by a factor of 4, and we're basically trading off bandwidth for latency.
 
 ### Complete implementation
 
@@ -278,7 +278,7 @@ Few more things to note:
 
 B-trees are basically $(k+1)$-ary trees, meaning that they store $k$ elements in each node and choose between $(k+1)$ possible branches instead of 2.
 
-They are widely used for indexing in databases, especially those that operate on-disk, because if $k$ is big, this allows large sequencial memory accesses while reducing the height of the tree.
+They are widely used for indexing in databases, especially those that operate on-disk, because if $k$ is big, this allows large sequential memory accesses while reducing the height of the tree.
 
 To do static binary searches, one can implement a B-tree in an implicit way, i. e. without actually storing any pointers and spending only $O(1)$ additional memory, and $k$ could be made equal to the cache line size so that each node request fetches exactly one cache line.
 
