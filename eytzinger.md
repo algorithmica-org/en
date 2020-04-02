@@ -77,7 +77,7 @@ The reality is much more complicated, e. g. main memory has pagination and HDD i
 
 * **Spacial locality** is an access pattern where if a memory location is requested, it is likely that a nearby memory locations will be requested again in the near future. *This is like storing the kinds of beer that you like on the same shelf.*
 
-The main problem with binary search over a sorted array is that its memory accesses pattern is neither temporary nor spacially local. For example, element $\lfloor \frac n 2 \rfloor$ is accessed very often (each search) and element $\lfloor \frac n 2 \rfloor + 1$ is not, while they are probably occupying the same cache line.
+The main problem with binary search over a sorted array is that its memory accesses pattern is neither temporary nor spacially local. For example, element $\lfloor \frac n 2 \rfloor$ is accessed very often (every search) and element $\lfloor \frac n 2 \rfloor + 1$ is not, while they are probably occupying the same cache line. In general, only the first 3-5 reads are temporary local and only the last 3-4 reads are spacially local, and the rest are just random memory accesses.
 
 We can overcome this by enumerating and permuting array elements in a more cache-friendly way. The numeration we will use is actually half a millenium old, and chances are you already know it.
 
@@ -115,7 +115,7 @@ This is how this layout will look when applied to binary search:
 
 ![](img/eytzinger.png)
 
-You can immediately see how it's temporal locality is better (in fact, theoretically optimal) as the elements closer to the root are closer to the beginning of the array, and thus are more likely to be fetched from cache.
+You can immediately see how its temporal locality is better (in fact, theoretically optimal) as the elements closer to the root are closer to the beginning of the array, and thus are more likely to be fetched from cache.
 
 ### Construction
 
@@ -165,7 +165,7 @@ This can be done in an elegant way by observing that the right turns are recorde
 To do this we can invert the number (`~x`) and call "find first set" instruction available on most systems. In GCC, the corresponding builtin is `__builtin_ffs`.
 
 ```cpp
-int search(int x) 
+int search(int x) {
     int k = 1;
     while (k <= n) {
         if (b[k] >= x)
@@ -197,9 +197,11 @@ while (k <= n)
     k = 2 * k + (b[k] < x);
 ```
 
+It also to saves us from executing a few arithmetic instructions directly.
+
 ### Prefetching
 
-Compiler doesn't like when CPU is sitting idle while waiting for memory fetches. Sometimes it can take a guess which cache line is going to be needed soon and fetch it ahead of time (recall that bandwidth-latency product is usually much larger than 1).
+Compiler doesn't like when CPU is sitting idle while waiting for memory fetches. Sometimes it can take a guess about which cache line is going to be needed soon and fetch it ahead of time (recall that bandwidth-latency product is usually much larger than 1).
 
 This works well for simple access patterns, like iterating over array in increasing or decreasing order, but for something complex like what we have here it's not going to perform well.
 
@@ -280,7 +282,7 @@ B-trees are basically $(k+1)$-ary trees, meaning that they store $k$ elements in
 
 They are widely used for indexing in databases, especially those that operate on-disk, because if $k$ is big, this allows large sequential memory accesses while reducing the height of the tree.
 
-To do static binary searches, one can implement a B-tree in an implicit way, i. e. without actually storing any pointers and spending only $O(1)$ additional memory, and $k$ could be made equal to the cache line size so that each node request fetches exactly one cache line.
+To perform static binary searches, one can implement a B-tree in an implicit way, i. e. without actually storing any pointers and spending only $O(1)$ additional memory, and $k$ could be made equal to the cache line size so that each node request fetches exactly one cache line.
 
 ![](img/btree.png)
 
