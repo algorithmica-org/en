@@ -10,7 +10,7 @@ We briefly review relevant concepts in processor architecture; if you want to ge
 
 * [What Every Programmer Should Know About Memory](https://people.freebsd.org/~lstewart/articles/cpumemory.pdf) by Ulrich Drepper
 
-Our minimalistic implementation is only ~15 lines of code while offering 4-5x speedup over `std::lower_bound`.
+Our minimalistic implementation is only ~15 lines of code while offering 4-5x speedup over `std::lower_bound`. The exact speedup depends a lot on available memory bandwidth (see notes below).
 
 **If you are writing a contest right now**, stuck on a problem where binary search is a bottleneck, and suddenly remembered about this article, **jump straight to "complete implementation"**, it's compilable and copy-pastable.
 
@@ -297,3 +297,7 @@ Let's assume that arithmetic costs nothing and do simple cache block analysis:
 This explains why they have roughly the same slope.
 
 Note that this method, while being great for single-threaded world, is unlikely to make its way into database and heavy multi-threaded applications, because it sacrifices bandwidth to achieve low latency.
+
+[Part 2](https://algorithmica.org/en/b-tree) explores efficient implementation of implicit static B-trees in bandwidth-constrained environment.
+
+
