@@ -8,7 +8,7 @@ It performs slightly worse on array sizes that fit lower layers of cache, but in
 
 B-trees generalize the concept of binary search trees by allowing nodes to have more than two children.
 
-Instead of single key, a B-tree node contains up to $B$ sorted keys may have up to $(B+1)$ children, thus reducing the tree heigh in $\frac{\log_2 n}{\log_B n} = \frac{\log B}{\log 2} = \log_2 B$ times.
+Instead of single key, a B-tree node contains up to $B$ sorted keys may have up to $(B+1)$ children, thus reducing the tree height in $\frac{\log_2 n}{\log_B n} = \frac{\log B}{\log 2} = \log_2 B$ times.
 
 They were primarily developed for the purpose of managing on-disk databases, as their random access times are almost the same as reading 1MB of data sequentially, which makes the trade-off between number of comparisons and tree height beneficial. In our implementation, we will make each the size of each block equal to the cache line size, which in case of `int` is 16 elements.
 
@@ -145,7 +145,7 @@ int cmp(reg x_vec, int* y_ptr) {
 
 After that, we call this function two times (because our node size / cache line happens to be 512 bits, which is twice as big) and blend these masks together with bitwise operations.
 
-## Complete implementaiton
+## Complete implementation
 
 ```cpp
 #pragma GCC optimize("O3")
@@ -225,7 +225,7 @@ int search(int x) {
 }
 ```
 
-It is ~30% slower (which is still good, because `std::sort` is 600% slower), but it saves you from rewriting the comparator with SIMD by hand, which in most cases is totally doable, but requires some effort.
+It is ~30% slower (which is still good, because `std::lower_bound` is still ~600% slower), but it saves you from rewriting the comparator with SIMD by hand, which in most cases is totally doable, but requires some effort.
 
 
 
