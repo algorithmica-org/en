@@ -54,12 +54,12 @@ Note that this approach causes a slight imbalance: "lefter" children may have la
 
 ## Basic Search
 
-Here is a short but rather inefficient implementation that we will improve later.
+Here is a short but rather inefficient implementation that we will improve later:
 
 ```cpp
 int search(int x) {
     int k = 0, res = INF;
-    start: // the only justified usage of goto statement
+    start: // the only justified usage of the goto statement
            // as doing otherwise would add extra inefficiency and more code
     while (k < nblocks) {
         for (int i = 0; i < B; i++) {
@@ -117,7 +117,9 @@ int i = __builtin_ffs(mask) - 1;
 
 …but ~8 times faster.
 
-The algorithm:
+Actually, compiler quite often produces very optimized code that leverages these instructions for certain types of loops. This is called auto-vectorization, and this is the reason why a loop that sums up an array of `short`s is faster (theoretically by a factor of two) than the same loop for `int`s: you can fit more elements on the same 256-bit block. Sadly, this is not our case, as we have loop-carried dependencies.
+
+The algorithm we will implement:
 
 1. Somewhere before the main loop, convert $x$ to a vector of $8$ copies of $x$.
 
@@ -158,12 +160,11 @@ using namespace std;
 
 typedef __m256i reg;
 
-const int n = (1<<20), m = (1<<22), B = 16;
+const int n = (1<<20), B = 16;
 const int nblocks = (n + B - 1) / B;
 const int INF = numeric_limits<int>::max();
 
-int a[n], q[m], results[m];
-alignas(64) int b[n+1], btree[nblocks][B];
+alignas(64) int btree[nblocks][B];
 
 int go(int k, int i) { return k * (B + 1) + i + 1; }
 
@@ -225,7 +226,7 @@ int search(int x) {
 }
 ```
 
-It is ~30% slower (which is still good, because `std::lower_bound` is still ~600% slower), but it saves you from rewriting the comparator with SIMD by hand, which in most cases is totally doable, but requires some effort.
+It is ~30% slower (which is still quite good, because `std::lower_bound` is ~600% slower), but it saves you from rewriting the comparator with SIMD by hand, which in most cases is totally doable, but requires some effort.
 
 
 
