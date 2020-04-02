@@ -108,7 +108,7 @@ Modern hardware can do [lots of stuff](https://software.intel.com/sites/landingp
 So, as we promised before, we will perform all $16$ comparisons to compute the index of the right child node, but we leverage SIMD instructions to do it efficiently. Just to clarify—we want to do something like this:
 
 ```cpp
-int mask = 0;
+int mask = (1 << B);
 for (int i = 0; i < B; i++)
     mask |= (btree[k][i] >= x) << i;
 int i = __builtin_ffs(mask) - 1;
@@ -205,7 +205,27 @@ That's it. This implementation should outperform even the [state-of-the-art inde
 
 Note that this implementation is very specific to the architecture. Older CPUs and CPUs on mobile devices don't have 256-bit wide registers and will crash (but they likely have 128-bit SIMD so the loop can still be split in 4 parts instead of 2), non-Intel CPUs have their own instruction sets for SIMD, and some computers even have different cache line size.
 
-Also, it may take some work to get it working with other data types or different comparators (you'll have to implement custom comparison using SIMD instructions), but in most cases this should be totally doable.
+### Legacy version
+
+If you consider using SIMD a form of cheating (not sure if this qualifies as "comparison-based binary search" anymore), or running it on older hardware, or need to use it with a custom data type and don't have too much time, try replacing `search` with this simpler version:
+
+```cpp
+int search(int x) {
+    int k = 0, res = INF;
+    while (k < nblocks) {
+        int mask = (1 << B);
+        for (int i = 0; i < B; i++)
+             mask |= (btree[k][i] >= x) << i;
+        int i = __builtin_ffs(mask) - 1;
+        if (i < B)
+            res = btree[k][i];
+        k = go(k, i);
+    }
+    return res;
+}
+```
+
+It is ~30% slower (which is still good, because `std::sort` is 600% slower), but it saves you from rewriting the comparator with SIMD by hand, which in most cases is totally doable, but requires some effort.
 
 
 
