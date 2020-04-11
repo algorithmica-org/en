@@ -87,7 +87,7 @@ We can overcome this by enumerating and permuting array elements in a more cache
 
 Ancestry mattered a lot back then, but writing down that data was expensive. *Ahnentafel* allows displaying a person's genealogy compactly, without wasting extra space by drawing diagrams.
 
-It lists a person's direct ancestors in a fixed sequence of ascent. First the person theirself is listed as number 1, and then, recursively, for each person numbered $k$ their father is listed as $2k$ and their mother as $(2k+1)$.
+It lists a person's direct ancestors in a fixed sequence of ascent. First, the person theirself is listed as number 1, and then, recursively, for each person numbered $k$, their father is listed as $2k$ and their mother as $(2k+1)$.
 
 Here is the example for Paul I, the great-grandson of Peter I, the Great:
 
@@ -105,7 +105,7 @@ Here is the example for Paul I, the great-grandson of Peter I, the Great:
 
 7. Johanna Elisabeth (Catherine's mother, Paul's maternal grandmother)
 
-Apart from being compact, it has some nice properties, like that all-even numbered persons are male and all odd-numbered (possibly apart from 1) are female.
+Apart from being compact, it has some nice properties, like that all even-numbered persons are male and all odd-numbered (possibly apart from 1) are female.
 
 One can also find the number of a particular ancestor only knowing the genders of their descendants. For example, Peter the Great's bloodline is Paul I → Peter III → Anna Petrovna → Peter the Great, so his number should be $((1 \times 2) \times 2 + 1) \times 2 = 10$.
 
@@ -137,13 +137,13 @@ int eytzinger(int i = 0, int k = 1) {
 }
 ```
 
-Despite being recursive, this is actually a really fast implementation as all read accesses are sequential.
+Despite being recursive, this is actually a really fast implementation as all memory reads are sequential.
 
 Note that the first element is left unfilled and the whole array is essencially 1-shifted. This will actually turn out to be a huge performance booster.
 
 ## Binary search implementation
 
-We can now descend this array using only indices: we just start with $k=1$ and execute $k := 2k$ if we need to go left and $k := 2k + 1$ if we need to go right. We don't even need to store and recalculate binary search boundaries, which is another selling point.
+We can now descend this array using only indices: we just start with $k=1$ and execute $k := 2k$ if we need to go left and $k := 2k + 1$ if we need to go right. We don't even need to store and recalculate binary search boundaries anymore.
 
 The only problem arises when we need to restore the index of the resulting element, as $k$ may end up not pointing to a leaf node. Here is an example of how that can happen:
 
@@ -197,7 +197,7 @@ while (k <= n)
     k = 2 * k + (b[k] < x);
 ```
 
-It also to saves us from executing a few arithmetic instructions directly.
+It also directly saves us from executing a few unnecessary arithmetic instructions.
 
 ### Prefetching
 
@@ -205,7 +205,7 @@ Compiler doesn't like when CPU is sitting idle while waiting for memory fetches.
 
 This works well for simple access patterns, like iterating over array in increasing or decreasing order, but for something complex like what we have here it's not going to perform well.
 
-As we know a bit more about our problem than the compiler does, we can tell it to explicitly prefetch a cache line we need. This is done by `__builtin_prefetch` in GCC:
+As we know a bit more about our problem than the compiler does, we can explicitly tell it to prefetch a cache line we need. This is done by `__builtin_prefetch` in GCC:
 
 ```cpp
 while (k <= n) {
@@ -299,5 +299,3 @@ This explains why they have roughly the same slope.
 Note that this method, while being great for single-threaded world, is unlikely to make its way into database and heavy multi-threaded applications, because it sacrifices bandwidth to achieve low latency.
 
 [Part 2](https://algorithmica.org/en/b-tree) explores efficient implementation of implicit static B-trees in bandwidth-constrained environment.
-
-
