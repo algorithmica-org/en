@@ -1,3 +1,3 @@
 # Algorithmica
 
-<center>One day /ru/ will be translated and put here.</center>
+<center>The website has [moved](https://en.algorithmica.org/hpc/).</center>
