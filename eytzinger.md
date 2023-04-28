@@ -148,15 +148,15 @@ We can now descend this array using only indices: we just start with $k=1$ and e
 The only problem arises when we need to restore the index of the resulting element, as $k$ may end up not pointing to a leaf node. Here is an example of how that can happen:
 
 ```python
-    array:  1 2 3 4 5 6 7 8
-eytzinger:  4 2 5 1 6 3 7 8
-1st range:  ---------------  k := 1
-2nd range:  -------          k := 2*k      (=2)
-3rd range:      ---          k := 2*k + 1  (=5)
-4th range:        -          k := 2*k + 1  (=11)
+    array:  1 2 3 4 5 6 7
+eytzinger:  4 2 6 1 3 5 7
+1st range:  -------------  k := 1     note: range in original array
+2nd range:  -------        k := 2*k      (=2)
+3rd range:      ---        k := 2*k + 1  (=5)
+4th range:        -        k := 2*k + 1  (=11)
 ```
 
-Here we query array of $[1, …, 8]$ for the lower bound of $x=4$. We compare it against $4$, $2$ and $5$, and go left-right-right and end up with $k = 11$, which isn't even a valid array index.
+Here we query array of $[1, …, 7]$ for the lower bound of $x=4$. We compare it against $4$, $2$ and $5$, and go left-right-right and end up with $k = 11$, which isn't even a valid array index.
 
 Note that, unless the answer is the last element of the array, we compare $x$ against it at some point, and after we learn that it is not less than $x$, we start comparing $x$ against elements to the left, and all these comparisons will evaluate true (i. e. leading to the right). Hence, the solution to restoring the resulting element is to cancel some number of right turns.
 
