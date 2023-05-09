@@ -274,7 +274,7 @@ Few more things to note:
 
 * Modern hardware won't penalize you for prefetching cache lines that aren't yours, though this maybe be an issue for older CPUs, which can be solved by a simple `if` statement.
 
-* For some reason, basic binary search implementation (the very first code block in this article) is already ~20% faster than `std::sort`.
+* For some reason, basic binary search implementation (the very first code block in this article) is already ~20% faster than `std::lower_bound`.
 
 ## What about B-trees?
 
